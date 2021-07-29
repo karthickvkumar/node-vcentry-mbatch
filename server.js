@@ -46,7 +46,47 @@ app.post('/api/student/create', (request, response) => {
   }
 
   response.status(200).send(data);
+});
+
+
+app.put('/api/student/edit/:id', (request, response) => {
+  const id = request.params.id;
+  const index = studentList.findIndex((value, index) => {
+    return value.id == id;
+  })
+
+  const editStudent = {
+    firstName : request.body.firstName,
+    lastName : request.body.lastName,
+    rollNo :request.body.rollNo,
+    age : request.body.age,
+    id : studentList[index].id
+  }
+
+  studentList[index] = editStudent;
+  const data = {
+    message : "User had been edited successfully"
+  }
+
+  response.status(200).send(data);
+
 })
+
+app.delete('/api/student/delete/:id', (request, response) => {
+  const id = request.params.id;
+  const index = studentList.findIndex((value, index) => {
+    return value.id == id;
+  })
+
+  studentList.splice(index, 1);
+
+  const data = {
+    message : "User had been deleted successfully"
+  }
+
+  response.status(200).send(data);
+})
+
 
 const port = process.env.port || 8080;
 http.listen(port, () => {
