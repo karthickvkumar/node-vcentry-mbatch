@@ -5,7 +5,7 @@ const bodyParse = require('body-parser');
 const mysql = require('mysql');
 const { response } = require('express');
 
-const DB_NAME = "student_db_test";
+const DB_NAME = "student_test_db";
 const TABLE_NAME = "student_info";
 
 app.use(bodyParse.json());
@@ -14,7 +14,8 @@ app.use(express.json());
 const connection = mysql.createConnection({
   host : 'localhost',
   user : 'root',
-  password : ''
+  password : '',
+  database : DB_NAME
 });
 
 connection.connect((error) => {
@@ -26,37 +27,60 @@ connection.connect((error) => {
   console.log("Connected to the SQL Server");
 })
 
-app.post('/api/create/db', (request, response) => {
+app.post('/api/create/table', (request, response) => {
   
-  connection.query(`CREATE DATABASE ${DB_NAME};`, (error, result) => {
+  const tableCreate = `CREATE TABLE ${TABLE_NAME} (first_name varchar(255), last_name varchar(255), age int(3), roll_no int(9), id int NOT NULL AUTO_INCREMENT, PRIMARY KEY(id))`;
+
+  connection.query(tableCreate, (error, result) => {
     if(error){
       response.status(500).send({
-        message : "Error in creating the Database", error});
+        message : "Error in creating the Table", error});
       return;
     }
 
-    const tableCreate = `USE ${DB_NAME}; CREATE TABLE ${TABLE_NAME} (first_name varchar(255), last_name varchar(255), age int(3), roll_no int(9))`;
-
-    connection.query(tableCreate, (error, result) => {
-      if(error){
-        response.status(500).send({
-          message : "Error in creating the Table", error});
-        return;
-      }
-
-      response.status(200).send("Successfully created a new Database and Table");
-    })
-    
+    response.status(200).send("Successfully created a new Table");
   });
 
 })
 
-app.get('/api/students', (request, response) => {
+
+app.post('/api/student/create', (request, response) => {
+  const firstName = request.body.first_name;
+  if(!firstName){
+    response.status(400).send('Invalid or Missing Frist Name value');
+    return;
+  }
+  const lastName = request.body.last_name;
+  if(!lastName){
+    response.status(400).send('Invalid or Missing Last Name value');
+    return;
+  }
+  const rollNo = request.body.roll_no;
+  if(!rollNo){
+    response.status(400).send('Invalid or Missing Roll Number value');
+    return;
+  }
+  const age = request.body.age;
+  if(!rollNo){
+    response.status(400).send('Invalid or Missing Age value');
+    return;
+  }
+
+  const query = `INSERT INTO ${TABLE_NAME} (first_name, last_name, age, roll_no) VALUES ('${firstName}', '${lastName}', ${age}, ${rollNo});`
+
+  connection.query(query, (error, result) => {
+    if(error){
+      response.status(500).send(error);
+      return;
+    }
+
+    response.status(200).send("New user profile has been created successfully");
+  })
 
 });
 
-app.post('/api/student/create', (request, response) => {
-  
+app.get('/api/students', (request, response) => {
+
 });
 
 
