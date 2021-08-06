@@ -125,7 +125,16 @@ app.put('/api/student/edit/:id', (request, response) => {
 })
 
 app.delete('/api/student/delete/:id', (request, response) => {
-  
+  const id = request.params.id;
+  const query = `DELETE FROM ${TABLE_NAME} WHERE id=${id}`
+
+  connection.query(query, (error, result) => {
+    if(error){
+      response.status(500).send(error);
+    }
+
+    response.status(200).send("User has been deleted Successfuly")
+  });
 })
 
 
