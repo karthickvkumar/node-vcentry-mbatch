@@ -80,12 +80,48 @@ app.post('/api/student/create', (request, response) => {
 });
 
 app.get('/api/students', (request, response) => {
+  const query = `SELECT * FROM ${TABLE_NAME};`;
+  connection.query(query, (error, result) => {
+    if(error){
+      response.status(500).send(error);
+    }
 
+    response.status(200).send(result);
+  })
 });
 
 
 app.put('/api/student/edit/:id', (request, response) => {
- 
+  const id = request.params.id;
+  const firstName = request.body.first_name;
+  if(!firstName){
+    response.status(400).send('Invalid or Missing Frist Name value');
+    return;
+  }
+  const lastName = request.body.last_name;
+  if(!lastName){
+    response.status(400).send('Invalid or Missing Last Name value');
+    return;
+  }
+  const rollNo = request.body.roll_no;
+  if(!rollNo){
+    response.status(400).send('Invalid or Missing Roll Number value');
+    return;
+  }
+  const age = request.body.age;
+  if(!rollNo){
+    response.status(400).send('Invalid or Missing Age value');
+    return;
+  }
+  const query = `UPDATE ${TABLE_NAME} SET first_name='${firstName}', last_name='${lastName}', age=${age}, roll_no=${rollNo} WHERE id=${id}`
+
+  connection.query(query, (error, result) => {
+    if(error){
+      response.status(500).send(error);
+    }
+
+    response.status(200).send("User has been updated Successfuly")
+  })
 })
 
 app.delete('/api/student/delete/:id', (request, response) => {
